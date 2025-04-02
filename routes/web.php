@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\WriterController;
+use App\Http\Middleware\BlockIpMiddleware;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\RevisorController;
 
@@ -11,6 +12,7 @@ use App\Http\Controllers\RevisorController;
 Route::get('/', [PublicController::class, 'homepage'])->name('homepage');
 Route::get('/careers', [PublicController::class, 'careers'])->name('careers');
 Route::post('/careers/submit', [PublicController::class, 'careersSubmit'])->name('careers.submit');
+Route::middleware('throttle:article-search')->get('/article/search', [ArticleController::class, 'search']);
 
 Route::get('/articles/index', [ArticleController::class, 'index'])->name('articles.index');
 Route::get('/articles/show/{article:slug}', [ArticleController::class, 'show'])->name('articles.show');
@@ -50,3 +52,4 @@ Route::middleware(['admin','admin.local'])->group(function(){
     Route::post('/admin/category/store', [AdminController::class, 'storeCategory'])->name('admin.storeCategory');
     Route::post('/admin/tag/store', [AdminController::class, 'storeTag'])->name('admin.storeTag');
 });
+
