@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 
+
 class FortifyServiceProvider extends ServiceProvider
 {
     /**
@@ -73,6 +74,16 @@ class FortifyServiceProvider extends ServiceProvider
             }
     
             return $limit;
+
+            RateLimiter::for('carrers', function (Request $request) {
+                $ip = $request->ip();
+                return Limit::perMinute(10)->by($ip);
+            });
+            
+            RateLimiter::for('submit', function (Request $request) {
+                $ip = $request->ip();
+                return Limit::perMinute(5)->by($ip);
+            });
         });
     }
 }
