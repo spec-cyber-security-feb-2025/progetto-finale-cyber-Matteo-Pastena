@@ -66,7 +66,7 @@ class FortifyServiceProvider extends ServiceProvider
             }
     
             // Definisce il limite (es. 20 richieste al minuto per IP)
-            $limit = Limit::perMinute(20)->by($ip);
+            $limit = Limit::perMinute(5)->by($ip);
     
             // Se l'IP supera il limite, viene bloccato per 10 minuti
             if ($limit->tooManyAttempts()) {
@@ -77,7 +77,7 @@ class FortifyServiceProvider extends ServiceProvider
 
             RateLimiter::for('carrers', function (Request $request) {
                 $ip = $request->ip();
-                return Limit::perMinute(10)->by($ip);
+                return Limit::perMinute(5)->by($ip);
             });
             
             RateLimiter::for('submit', function (Request $request) {

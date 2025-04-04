@@ -34,7 +34,7 @@ class AdminController extends Controller
             if (empty($response)) {
                 throw new Exception('La risposta dalla richiesta HTTP è vuota.');
             }
-           
+
             // Decodifica il JSON
             $financialData = json_decode($response, true);
 
