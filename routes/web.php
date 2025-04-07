@@ -23,7 +23,7 @@ Route::prefix('articles')->group(function () {
 
 // Writer routes
 Route::middleware('writer')->group(function () {
-    Route::prefix('writer', function () {
+    Route::prefix('writer')->group(function () {
         Route::get('dashboard', [WriterController::class, 'dashboard'])->name('writer.dashboard');
         Route::get('articles/create', [ArticleController::class, 'create'])->name('articles.create');
         Route::post('articles/store', [ArticleController::class, 'store'])->name('articles.store');

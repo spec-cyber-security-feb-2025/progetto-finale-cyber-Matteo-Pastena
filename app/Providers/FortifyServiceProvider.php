@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Laravel\Fortify\Fortify;
+use Illuminate\Support\Facades\Log;
 use App\Actions\Fortify\CreateNewUser;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -13,7 +14,6 @@ use App\Actions\Fortify\UpdateUserPassword;
 use Illuminate\Support\Facades\RateLimiter;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 use App\Actions\Fortify\UpdateUserProfileInformation;
-
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -38,6 +38,7 @@ class FortifyServiceProvider extends ServiceProvider
         // Rate limiter per il login
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
+            Log::info("L'utente $throttleKey ha effettuato un tentativo di login.");
     
             return Limit::perMinute(5)->by($throttleKey);
         });
