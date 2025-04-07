@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use GuzzleHttp\Client;
+use Illuminate\Support\Str;
 use GuzzleHttp\Exception\RequestException;
 
 class HttpService
@@ -22,11 +23,16 @@ class HttpService
     {
         $parsedUrl = parse_url($url);
 
+        if (Str::startsWith($url, 'http://internal.finance') && auth()->user()->role !== 'admin') {
+            abort(403, 'Non sei autorizzato ad accedere a questa risorsa interna.');
+        }
+        
+
         // Validate protocol
         if (!in_array($parsedUrl['scheme'], $this->allowedProtocols)) {
             return 'Protocol not allowed';
         }
-       
+
         // Validate domain
         if (!isset($parsedUrl['host']) || !in_array($parsedUrl['host'], $this->allowedDomains)) {
             return 'Domain not allowed';
