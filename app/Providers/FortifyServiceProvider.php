@@ -5,14 +5,16 @@ namespace App\Providers;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Laravel\Fortify\Fortify;
+use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use App\Actions\Fortify\CreateNewUser;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Actions\Fortify\UpdateUserPassword;
 use Illuminate\Support\Facades\RateLimiter;
-use Symfony\Component\HttpKernel\Attribute\Cache;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 
 class FortifyServiceProvider extends ServiceProvider
@@ -39,8 +41,18 @@ class FortifyServiceProvider extends ServiceProvider
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
             Log::info("L'utente $throttleKey ha effettuato un tentativo di login.");
+            
     
             return Limit::perMinute(5)->by($throttleKey);
+        });
+
+        Event::listen(Logout::class, function (Logout $event) {
+            $user = $event->user;
+            $ip = request()->ip(); // Prende l'IP dalla request attuale
+        
+            if ($user) {
+                Log::info("L'utente {$user->email} ha effettuato il logout da IP {$ip}.");
+            }
         });
     
         // Rate limiter per il two-factor authentication
@@ -56,6 +68,7 @@ class FortifyServiceProvider extends ServiceProvider
         // registrazione
         Fortify::registerView(function () {
             return view('auth.register');
+            Log::info("L'utente $throttleKey ha effettuato un tentativo di registrazione.");
         });
 
         RateLimiter::for('article-search', function (Request $request) {

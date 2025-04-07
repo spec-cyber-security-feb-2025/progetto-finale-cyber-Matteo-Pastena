@@ -36,6 +36,7 @@ class ArticleController extends Controller implements HasMiddleware
      */
     public function create()
     {
+        Log::info("L'utente ".Auth::user()->name." ha provato di creare un articolo.");
         return view('articles.create');
     }
 
@@ -92,6 +93,7 @@ class ArticleController extends Controller implements HasMiddleware
      */
     public function edit(Article $article)
     {
+        Log::info("L'utente ".Auth::user()->name." ha provato a modificare un articolo.");
         if(Auth::user()->id != $article->user_id){
             return redirect()->route('homepage')->with('alert', 'Accesso non consentito');
         }
@@ -151,6 +153,7 @@ class ArticleController extends Controller implements HasMiddleware
      */
     public function destroy(Article $article)
     {
+        Log::info("L'utente ".Auth::user()->name." ha provato a cancellare un articolo.");
         foreach ($article->tags as $tag) {
             $article->tags()->detach($tag);
         }
