@@ -20,6 +20,7 @@ class UserIsWriter
         $allowedDomain = 'cyber.blog'; // Cambia con il tuo dominio reale
         $referer = parse_url($request->headers->get('referer'), PHP_URL_HOST);
         $origin = parse_url($request->headers->get('origin'), PHP_URL_HOST);
+        
         if (($referer && $referer !== $allowedDomain) || ($origin && $origin !== $allowedDomain)) {
             return response()->json(['error' => 'Access denied: Invalid Referer or Origin'], Response::HTTP_FORBIDDEN);
         }

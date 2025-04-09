@@ -83,8 +83,8 @@ class FortifyServiceProvider extends ServiceProvider
             $limit = Limit::perMinute(5)->by($ip);
     
             // Se l'IP supera il limite, viene bloccato per 10 minuti
-            if ($limit->tooManyAttempts()) {
-                Cache::put("blocked:$ip", true, now()->addMinutes(10));
+            if ($limit) {
+                Cache::put("blocked:$ip", true, now()->addMinutes(3));
             }
     
             return $limit;

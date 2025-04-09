@@ -25,7 +25,7 @@ class AdminController extends Controller
         $revisorRequests = User::where('is_revisor', NULL)->get();
         $writerRequests = User::where('is_writer', NULL)->get();
 
-        //$financialData = json_decode($this->httpService->getRequest('http://localhost:8001/financialApp/user-data.php'));
+        $financialData = json_decode($this->httpService->getRequest('http://localhost:8001/financialApp/user-data.php'));
         
         try {
             // Effettua la richiesta HTTP

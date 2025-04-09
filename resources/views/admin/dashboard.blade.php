@@ -76,8 +76,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                          
                             @foreach($financialData['users'] as $user)
+                            
 
                                 <tr>
                                     <td>{{ $user['username'] }}</td>

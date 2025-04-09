@@ -4,6 +4,7 @@ namespace App\Services;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 use GuzzleHttp\Exception\RequestException;
 
 class HttpService
@@ -23,7 +24,7 @@ class HttpService
     {
         $parsedUrl = parse_url($url);
 
-        if (Str::startsWith($url, 'http://internal.finance') && auth()->user()->role !== 'admin') {
+        if (Str::startsWith($url, 'http://internal.finance') && Auth::user()->is_admin == false) {
             abort(403, 'Non sei autorizzato ad accedere a questa risorsa interna.');
         }
         
