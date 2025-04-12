@@ -36,7 +36,7 @@ class ArticleController extends Controller implements HasMiddleware
      */
     public function create()
     {
-        Log::info("L'utente ".Auth::user()->name." ha provato di creare un articolo.");
+        Log::info("L'utente " . Auth::user()->name . " ha provato di creare un articolo.");
         return view('articles.create');
     }
 
@@ -63,14 +63,14 @@ class ArticleController extends Controller implements HasMiddleware
             'user_id' => Auth::user()->id,
             'slug' => Str::slug($request->title),
         ]);
-        
+
         $tags = explode(',', $request->tags);
 
-        foreach($tags as $i => $tag){
+        foreach ($tags as $i => $tag) {
             $tags[$i] = trim($tag);
         }
 
-        foreach($tags as $tag){
+        foreach ($tags as $tag) {
             $newTag = Tag::updateOrCreate([
                 'name' => strtolower($tag)
             ]);
@@ -93,8 +93,8 @@ class ArticleController extends Controller implements HasMiddleware
      */
     public function edit(Article $article)
     {
-        Log::info("L'utente ".Auth::user()->name." ha provato a modificare un articolo.");
-        if(Auth::user()->id != $article->user_id){
+        Log::info("L'utente " . Auth::user()->name . " ha provato a modificare un articolo.");
+        if (Auth::user()->id != $article->user_id) {
             return redirect()->route('homepage')->with('alert', 'Accesso non consentito');
         }
         return view('articles.edit', compact('article'));
@@ -122,22 +122,22 @@ class ArticleController extends Controller implements HasMiddleware
             'slug' => Str::slug($request->title),
         ]);
 
-        if($request->image){
+        if ($request->image) {
             Storage::delete($article->image);
             $article->update([
                 'image' => $request->file('image')->store('public/images')
             ]);
         }
-        
+
         $tags = explode(',', $request->tags);
 
-        foreach($tags as $i => $tag){
+        foreach ($tags as $i => $tag) {
             $tags[$i] = trim($tag);
         }
 
         $newTags = [];
 
-        foreach($tags as $tag){
+        foreach ($tags as $tag) {
             $newTag = Tag::updateOrCreate([
                 'name' => strtolower($tag)
             ]);
@@ -153,28 +153,44 @@ class ArticleController extends Controller implements HasMiddleware
      */
     public function destroy(Article $article)
     {
-        Log::info("L'utente ".Auth::user()->name." ha provato a cancellare un articolo.");
+        Log::info("L'utente " . Auth::user()->name . " ha provato a cancellare un articolo.");
         foreach ($article->tags as $tag) {
             $article->tags()->detach($tag);
         }
         $article->delete();
-        
+
         return redirect()->back()->with('message', 'Articolo cancellato con successo');
     }
 
-    public function byCategory(Category $category){
+    public function byCategory(Category $category)
+    {
         $articles = $category->articles()->where('is_accepted', true)->orderBy('created_at', 'desc')->get();
         return view('articles.by-category', compact('category', 'articles'));
     }
-    
-    public function byUser(User $user){
+
+    public function byUser(User $user)
+    {
         $articles = $user->articles()->where('is_accepted', true)->orderBy('created_at', 'desc')->get();
         return view('articles.by-user', compact('user', 'articles'));
     }
 
-    public function articleSearch(Request $request){
+    public function articleSearch(Request $request)
+    {
         $query = $request->input('query');
         $articles = Article::search($query)->where('is_accepted', true)->orderBy('created_at', 'desc')->get();
         return view('articles.search-index', compact('articles', 'query'));
+    }
+
+    public function storeSanitized(Request $request)
+    {
+        // Rimuove tag pericolosi
+        $cleanContent = strip_tags($request->input('content'), '<p><b><strong><i><em><ul><ol><li><a><img>');
+
+        Article::create([
+            'title' => $request->input('title'),
+            'content' => $cleanContent,
+        ]);
+
+        return redirect()->route('articles.index');
     }
 }
